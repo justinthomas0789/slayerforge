@@ -11,7 +11,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, state } = useCart();
 
   const handleCardClick = () => {
     navigate(`/products/${product.documentId}`);
@@ -22,6 +22,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     if (onAddToCart) {
       onAddToCart();
     } else {
+      const maxStock = product.stockCount || 100;
+      
+      // Check current quantity in cart
+      const currentCartItem = state.items.find(item => item.product.documentId === product.documentId);
+      const currentQuantity = currentCartItem ? currentCartItem.quantity : 0;
+      
+      if (maxStock < 1) {
+        alert('This item is out of stock!');
+        return;
+      }
+      
+      if (currentQuantity >= maxStock) {
+        alert(`You already have the maximum available quantity (${maxStock}) in your cart!`);
+        return;
+      }
+      
       addToCart(product, 1);
     }
   };
@@ -50,6 +66,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
 
   const getRarityColor = (rarity: string = 'common') => {
     switch (rarity.toLowerCase()) {
+      case 'mythic': return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white';
       case 'legendary': return 'bg-yellow-500 text-yellow-900';
       case 'epic': return 'bg-purple-500 text-purple-900';
       case 'rare': return 'bg-blue-500 text-blue-900';
@@ -85,9 +102,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
           </div>
         )}
         <div className="absolute top-2 right-2">
-          <Badge className={getRarityColor(product.rarity)}>
-            {(product.rarity || 'common').toUpperCase()}
-          </Badge>
+          {product.rarityColor ? (
+            <span 
+              className="px-3 py-1 rounded text-sm font-bold text-white shadow-lg"
+              style={{ backgroundColor: product.rarityColor }}
+            >
+              {(product.rarity || 'common').toUpperCase()}
+            </span>
+          ) : (
+            <Badge className={getRarityColor(product.rarity)}>
+              {(product.rarity || 'common').toUpperCase()}
+            </Badge>
+          )}
         </div>
         {!product.inStock && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">

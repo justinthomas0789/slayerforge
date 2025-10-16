@@ -2,13 +2,14 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ApolloProvider, useQuery } from '@apollo/client/react';
 import { gql } from '@apollo/client/core';
 import { apolloClient } from './apollo/client';
-import { CartProvider, useCart } from './context/CartContext';
+import { CartProvider } from './context/CartContext';
 import { ProductList } from './components/ProductList';
 import { ProductDetail } from './components/ProductDetail';
 import { Cart } from './components/Cart';
 import { Checkout } from './components/Checkout';
 import { About } from './components/About';
-import { Swords, ShoppingCart, Star, Zap, Shield, ChevronRight } from 'lucide-react';
+import { Header } from './components/Header';
+import { Swords, Star, Zap, Shield, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { ProductsResponse } from './types';
 
@@ -16,8 +17,6 @@ import type { ProductsResponse } from './types';
 function HomePage() {
   const [isVisible, setIsVisible] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { state } = useCart();
-  const cartItemCount = state.items.reduce((count, item) => count + item.quantity, 0);
 
   useEffect(() => {
     setIsVisible(true);
@@ -50,39 +49,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
-      {/* Navigation Bar */}
-      <nav className="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3 group">
-              <Swords className="h-8 w-8 text-pink-500 group-hover:rotate-12 transition-transform duration-300" />
-              <span className="text-2xl font-bold text-white">SlayerForge</span>
-            </Link>
-            <div className="flex items-center space-x-6">
-              <Link 
-                to="/products" 
-                className="text-white hover:text-pink-400 transition-colors duration-200 font-medium"
-              >
-                Products
-              </Link>
-              <Link 
-                to="/about" 
-                className="text-white hover:text-pink-400 transition-colors duration-200 font-medium"
-              >
-                About
-              </Link>
-              <Link to="/cart" className="relative p-2 text-white hover:text-pink-400 transition-colors duration-200">
-                <ShoppingCart className="h-6 w-6" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartItemCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       {/* Hero Section with Slideshow */}
       <div className={`relative overflow-hidden transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
@@ -250,12 +217,10 @@ function HomePage() {
 }
 
 function ProductsPage() {
-  const { state } = useCart();
-  const cartItemCount = state.items.reduce((count, item) => count + item.quantity, 0);
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
   const { data } = useQuery<ProductsResponse>(gql`
     query GetProducts {
-      products {
+      products(pagination: { limit: 100 }) {
         documentId
         category
       }
@@ -281,45 +246,7 @@ function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
-      {/* Navigation Bar (same as homepage) */}
-      <nav className="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3 group">
-              <Swords className="h-8 w-8 text-pink-500 group-hover:rotate-12 transition-transform duration-300" />
-              <span className="text-2xl font-bold text-white">SlayerForge</span>
-            </Link>
-            <div className="flex items-center space-x-6">
-              <Link 
-                to="/products" 
-                className="text-pink-400 font-medium border-b-2 border-pink-400"
-              >
-                Products
-              </Link>
-              <Link 
-                to="/about" 
-                className="text-white hover:text-pink-400 transition-colors duration-200 font-medium"
-              >
-                About
-              </Link>
-              <Link 
-                to="/" 
-                className="text-white hover:text-pink-400 transition-colors duration-200 font-medium"
-              >
-                Home
-              </Link>
-              <Link to="/cart" className="relative p-2 text-white hover:text-pink-400 transition-colors duration-200">
-                <ShoppingCart className="h-6 w-6" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartItemCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 py-16">
