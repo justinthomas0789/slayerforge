@@ -18,26 +18,41 @@ export default {
    */
   async bootstrap({ strapi }) {
     // Set up public permissions for GraphQL
-    const publicRole = await strapi
-      .query('plugin::users-permissions.role')
-      .findOne({ where: { type: 'public' } });
+    try {
+      const publicRole = await strapi
+        .query('plugin::users-permissions.role')
+        .findOne({ where: { type: 'public' } });
 
-    if (publicRole) {
-      // Enable public access to Product queries
-      await strapi.query('plugin::users-permissions.permission').updateMany({
-        where: {
-          role: publicRole.id,
-          action: {
-            $in: [
-              'api::product.product.find',
-              'api::product.product.findOne',
-            ],
-          },
-        },
-        data: { enabled: true },
-      });
+      if (publicRole) {
+        // Find existing permissions for Product API
+        const permissions = await strapi
+          .query('plugin::users-permissions.permission')
+          .findMany({
+            where: {
+              role: publicRole.id,
+              action: {
+                $in: [
+                  'api::product.product.find',
+                  'api::product.product.findOne',
+                ],
+              },
+            },
+          });
 
-      console.log('✅ Public permissions set for Product API');
+        // Update each permission individually
+        for (const permission of permissions) {
+          await strapi
+            .query('plugin::users-permissions.permission')
+            .update({
+              where: { id: permission.id },
+              data: { enabled: true },
+            });
+        }
+
+        console.log('✅ Public permissions set for Product API');
+      }
+    } catch (error) {
+      console.error('⚠️  Could not set permissions:', error.message);
     }
 
     // Import products if database is empty
