@@ -20,7 +20,7 @@
    - Click "New Project"
    - Select "Deploy from GitHub repo"
    - Choose `slayerforge` repo
-   - Set root directory: `backend`
+   - ⚠️ **IMPORTANT:** After creating the project, go to Settings → Service → Root Directory and set it to `backend`
 
 3. **Add Database:**
    - Click "New" → "Database" → "PostgreSQL"
