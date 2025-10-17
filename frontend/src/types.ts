@@ -20,6 +20,17 @@ export interface Product {
     url: string;
     alternativeText?: string;
   };
+  // Equipment Stats
+  sharpness?: number;
+  durability?: number;
+  speed?: number;
+  power?: number;
+  defense?: number;
+  weight?: number;
+  material?: string;
+  manufacturer?: string;
+  aiFeature?: string;
+  rarityColor?: string;
 }
 
 export interface ProductsResponse {

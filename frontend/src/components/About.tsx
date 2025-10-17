@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@apollo/client/react';
 import { gql } from '@apollo/client/core';
+import { Header } from './Header';
 import { Swords, Shield, Heart } from 'lucide-react';
 
 interface TeamMember {
@@ -61,6 +62,8 @@ export const About: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+      <Header />
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-purple-600/20"></div>

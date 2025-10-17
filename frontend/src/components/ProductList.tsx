@@ -6,13 +6,18 @@ import type { Product, ProductsResponse } from '../types.ts';
 
 const GET_PRODUCTS = gql`
   query GetProducts {
-    products {
+    products(pagination: { limit: 100 }) {
       documentId
       name
       price
       category
+      rarity
+      rarityColor
+      breathingStyle
+      weaponType
       featured
       inStock
+      stockCount
       createdAt
       image {
         url
