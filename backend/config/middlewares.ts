@@ -1,20 +1,25 @@
-export default ({ env }) => [
+export default [
   'strapi::logger',
   'strapi::errors',
-  'strapi::security',
+  {
+    name: 'strapi::security',
+    config: {
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          'connect-src': ["'self'", 'https:'],
+          'img-src': ["'self'", 'data:', 'blob:', 'https:'],
+          'media-src': ["'self'", 'data:', 'blob:', 'https:'],
+          upgradeInsecureRequests: null,
+        },
+      },
+    },
+  },
   'strapi::cors',
   'strapi::poweredBy',
   'strapi::query',
   'strapi::body',
-  {
-    name: 'strapi::session',
-    config: {
-      cookie: {
-        secure: env('NODE_ENV') === 'production',
-        sameSite: env('NODE_ENV') === 'production' ? 'none' : 'lax',
-      },
-    },
-  },
+  'strapi::session',
   'strapi::favicon',
   'strapi::public',
 ];
