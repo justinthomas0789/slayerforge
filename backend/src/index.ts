@@ -16,5 +16,28 @@ export default {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  async bootstrap({ strapi }) {
+    // Set up public permissions for GraphQL
+    const publicRole = await strapi
+      .query('plugin::users-permissions.role')
+      .findOne({ where: { type: 'public' } });
+
+    if (publicRole) {
+      // Enable public access to Product queries
+      await strapi.query('plugin::users-permissions.permission').updateMany({
+        where: {
+          role: publicRole.id,
+          action: {
+            $in: [
+              'api::product.product.find',
+              'api::product.product.findOne',
+            ],
+          },
+        },
+        data: { enabled: true },
+      });
+
+      console.log('✅ Public permissions set for Product API');
+    }
+  },
 };
